@@ -93,7 +93,7 @@ server=function(input,output,session){
           plot(c(0,200),c(0,100),ann=F,xaxt='n',yaxt='n',bty='n',col='white')
           text(100,50,labels='Programa\nindisponível',cex=3)
         }else{
-          drawProg(progr,vars$dados[PROGRAMA%in%as.numeric(input$programa)&CANCELADA==0&OCORRENCIA_N==1])
+          drawProg(progr,vars$dados[PROGRAMA%in%as.numeric(input$programa)&CANCELADA==0&NROINTERACAO==1])
         }
         # Return a list containing information about the image
         dev.off()
