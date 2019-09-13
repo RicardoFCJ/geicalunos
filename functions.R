@@ -20,11 +20,9 @@ drawProg=function(path,al,Change="Default"){
   prog=as.data.table(read_xlsx(path))
   passos=prog[,PASSO]
   passoOco = as.data.table(dbGetQuery(sql,paste0('select * from PASSOOCORRENCIA where PASSO_ID in (',paste(passos,collapse=', '),')')))
-  passoOco = passoOco[PROGRAMA_ID==programa]
   passoOco[,NOME:=factor(prog[match(PASSO_ID,prog$PASSO),NOME],levels=prog[,unique(NOME)])]
   if(Change=="Default"){
-    al=al[Default==1]
-    passoOco[,WHERE:=factor(prog[match(PASSO_ID,prog$PASSO),Default],levels=prog[,unique(NOME)])]
+    passoOco[,WHERE:=prog[match(PASSO_ID,prog$PASSO),Default]]
   }
   blocoOco=as.data.table(dbGetQuery(sql,paste0('select * from BLOCOOCORRENCIA where PASSO_ID in (',paste(passoOco[,unique(PASSO_ID)],collapse=', '),')')))
   bloco=as.data.table(dbGetQuery(sql,paste0('select * from BLOCO where ID in (',paste(blocoOco[,BLOCO_ID],collapse=', '),')')))[,.(ID,TENTATIVAOCORRENCIAINICIAL_ID)]
