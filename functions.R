@@ -22,6 +22,10 @@ drawProg=function(path,al,Change="Default"){
   passoOco = as.data.table(dbGetQuery(sql,paste0('select * from PASSOOCORRENCIA where PASSO_ID in (',paste(passos,collapse=', '),')')))
   passoOco = passoOco[PROGRAMA_ID==programa]
   passoOco[,NOME:=factor(prog[match(PASSO_ID,prog$PASSO),NOME],levels=prog[,unique(NOME)])]
+  if(Change=="Default"){
+    al=al[Default==1]
+    passoOco[,WHERE:=factor(prog[match(PASSO_ID,prog$PASSO),Default],levels=prog[,unique(NOME)])]
+  }
   blocoOco=as.data.table(dbGetQuery(sql,paste0('select * from BLOCOOCORRENCIA where PASSO_ID in (',paste(passoOco[,unique(PASSO_ID)],collapse=', '),')')))
   bloco=as.data.table(dbGetQuery(sql,paste0('select * from BLOCO where ID in (',paste(blocoOco[,BLOCO_ID],collapse=', '),')')))[,.(ID,TENTATIVAOCORRENCIAINICIAL_ID)]
   bloco[,PASSO_ID:=blocoOco[match(bloco$ID,BLOCO_ID),PASSO_ID]]
@@ -36,12 +40,11 @@ drawProg=function(path,al,Change="Default"){
   for(i in 1:passoOco[,uniqueN(NOME)]){
     cur.nome=passoOco[NOME%in%levels(NOME)[i],unique(NOME)]
     cur.passosOco=passoOco[NOME%in%levels(NOME)[i],unique(ID)]
+    cur.passosOco.n=passoOco[NOME%in%levels(NOME)[i]&WHERE==1,unique(ID)]
     cur.passos=passoOco[NOME%in%levels(NOME)[i],unique(PASSO_ID)]
+    cur.passos.n=passoOco[NOME%in%levels(NOME)[i]&WHERE==1,unique(PASSO_ID)]
     symbols(x,y,rectangles = matrix(c(alt,larg),ncol=2),add = T,inches=F,bg=ifelse(al[,any(PASSOOCO_ID%in%cur.passosOco)],'lightgreen','white'))
-    if(Change=="Default"){
-      al=al[Default==1]
-    }
-    reps=al[PASSOOCO_ID%in%cur.passosOco&OCORRENCIA_ID%in%passoOco[PASSO_ID%in%cur.passos,TentIni],uniqueN(ID),by=OCORRENCIA_ID][,ifelse(.N>0,max(V1),0)]
+    reps=al[PASSOOCO_ID%in%cur.passosOco.n&OCORRENCIA_ID%in%passoOco[PASSO_ID%in%cur.passos.n,TentIni],uniqueN(ID),by=OCORRENCIA_ID][,ifelse(.N>0,max(V1),0)]
     text(x,y,labels=paste0(cur.nome,' (',reps,')'),cex=.7)
     plts=plts+1
     if(plts==7){plts=0;x=0;y=y-150}else{
