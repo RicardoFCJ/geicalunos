@@ -15,7 +15,7 @@ alunoinfo = function(dt){
 }
 dateF = function(x){format.Date(x,"%d de %b de %Y")}
 
-drawProg=function(path,al){
+drawProg=function(path,al,Change="Default"){
   programa=unlist(strsplit(path,"-"))[[1]][1]%>%{gsub("[^0-9]","",.)}%>%as.numeric
   prog=as.data.table(read_xlsx(path))
   passos=prog[,PASSO]
@@ -38,6 +38,9 @@ drawProg=function(path,al){
     cur.passosOco=passoOco[NOME%in%levels(NOME)[i],unique(ID)]
     cur.passos=passoOco[NOME%in%levels(NOME)[i],unique(PASSO_ID)]
     symbols(x,y,rectangles = matrix(c(alt,larg),ncol=2),add = T,inches=F,bg=ifelse(al[,any(PASSOOCO_ID%in%cur.passosOco)],'lightgreen','white'))
+    if(Change=="Default"){
+      al=al[Default==1]
+    }
     reps=al[PASSOOCO_ID%in%cur.passosOco&OCORRENCIA_ID%in%passoOco[PASSO_ID%in%cur.passos,TentIni],uniqueN(ID),by=OCORRENCIA_ID][,ifelse(.N>0,max(V1),0)]
     text(x,y,labels=paste0(cur.nome,' (',reps,')'),cex=.7)
     plts=plts+1
