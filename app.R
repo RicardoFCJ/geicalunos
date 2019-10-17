@@ -3,7 +3,6 @@ library(shinythemes);library(lubridate);library(plotly);library(shinydashboard)
 source("/home/ricardo/geicdatamining/coletando.R")
 source("/home/ricardo/geicdatamining/functions.R")
 source('functions.R')
-
 ui = dashboardPage(
   dashboardHeader(title='GEIC Alunos'),
   dashboardSidebar(
@@ -43,8 +42,12 @@ server=function(input,output,session){
                     })
     progs=sapply(progs,function(x)unlist(strsplit(x,'-'))[1])
     progs=intersect(availProgs,progs)
-    names(progs)=grep(paste(progs,collapse="|"),progsNam,value=T)
-    updateSelectInput(session,'programa',choices=progs)
+    if(length(progs)>0){
+      names(progs)=grep(paste(progs,collapse="|"),progsNam,value=T)
+      updateSelectInput(session,'programa',choices=progs)
+    }else{
+      updateSelectInput(session,'programa',choices=c())
+    }
   })
   
   observeEvent(c(vars$dados,input$update_data),{
@@ -88,12 +91,14 @@ server=function(input,output,session){
         outfile <- tempfile(fileext = ".png")
         width  <- session$clientData$output_graph2_width
         height <- session$clientData$output_graph2_height
+        data = vars$dados[PROGRAMA%in%as.numeric(input$programa)&CANCELADA==0&NROINTERACAO==1]
+        
         png(outfile, width=width, height=height)
-        if(is.numeric(progr)){
+        if(dim(data)[1]<1){
           plot(c(0,200),c(0,100),ann=F,xaxt='n',yaxt='n',bty='n',col='white')
           text(100,50,labels='Programa\nindisponível',cex=3)
         }else{
-          drawProg(progr,vars$dados[PROGRAMA%in%as.numeric(input$programa)&CANCELADA==0&NROINTERACAO==1])
+          drawProg(progr,data)
         }
         # Return a list containing information about the image
         dev.off()
