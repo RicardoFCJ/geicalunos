@@ -60,6 +60,7 @@ drawProg=function(path,al,Change="Default"){
       reps=al[OCORRENCIA_ID%in%cur.oco.n&PASSOOCO_ID%in%cur.passos,uniqueN(ID)]
     
       }else{
+      passoOco = as.data.table(dbReadTable(sql,"PASSOOCORRENCIA"))
       cur.passos=passoOco[NOME%in%levels(NOME)[i],unique(PASSO_ID)]
       cur.passos.n=passoOco[NOME%in%levels(NOME)[i]&WHERE==1,unique(PASSO_ID)]
       bgcol=ifelse(al[,any(PASSOOCO_ID%in%cur.oco)],'lightgreen','white')
