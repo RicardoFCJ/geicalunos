@@ -53,19 +53,19 @@ drawProg=function(path,al,Change="Default"){
     cur.oco=as.numeric(prog[NOME%in%levels(NOME)[i],unique(splitst(PASSOOCO_ID))])
     cur.oco.n=prog[NOME%in%levels(NOME)[i]&!is.na(TENTATIVAOCO_ID),unique(TENTATIVAOCO_ID)]
     
-    if(grepl("Módulo1",path)){
+    #if(grepl("Módulo1",path)){
       cur.passos=prog[NOME%in%levels(NOME)[i],as.numeric(splitst(unique(PASSOOCO_ID)))]
       cur.passos.n=prog[NOME%in%levels(NOME)[i]&!is.na(TENTATIVAOCO_ID),as.numeric(splitst(unique(PASSOOCO_ID)))]
       bgcol=ifelse(al[PASSOOCO_ID%in%cur.passos,any(PASSOOCO_ID%in%cur.oco)],'lightgreen','white')
       reps=al[OCORRENCIA_ID%in%cur.oco.n&PASSOOCO_ID%in%cur.passos,uniqueN(ID)]
     
-      }else{
-      passoOco = as.data.table(dbReadTable(sql,"PASSOOCORRENCIA"))
-      cur.passos=passoOco[NOME%in%levels(NOME)[i],unique(PASSO_ID)]
-      cur.passos.n=passoOco[NOME%in%levels(NOME)[i]&WHERE==1,unique(PASSO_ID)]
-      bgcol=ifelse(al[,any(PASSOOCO_ID%in%cur.oco)],'lightgreen','white')
-      reps=al[PASSOOCO_ID%in%cur.oco.n&OCORRENCIA_ID%in%passoOco[PASSO_ID%in%cur.passos.n,TentIni],uniqueN(ID),by=PASSOOCO_ID][,ifelse(.N>0,max(V1),0)]
-    }
+    #  }else{
+    #  passoOco = as.data.table(dbReadTable(sql,"PASSOOCORRENCIA"))
+    #  cur.passos=passoOco[NOME%in%levels(NOME)[i],unique(PASSO_ID)]
+    #  cur.passos.n=passoOco[NOME%in%levels(NOME)[i]&WHERE==1,unique(PASSO_ID)]
+    #  bgcol=ifelse(al[,any(PASSOOCO_ID%in%cur.oco)],'lightgreen','white')
+    #  reps=al[PASSOOCO_ID%in%cur.oco.n&OCORRENCIA_ID%in%passoOco[PASSO_ID%in%cur.passos.n,TentIni],uniqueN(ID),by=PASSOOCO_ID][,ifelse(.N>0,max(V1),0)]
+    #}
     
     symbols(x,y,rectangles = matrix(c(alt,larg),ncol=2),add = T,inches=F,bg=bgcol)
     text(x,y,labels=paste0(cur.nome,' (',reps,')'),cex=.7)
